@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="generator" content="rustdoc">
+    <meta name="description" content="API documentation for the Rust `tobj` crate.">
+    <meta name="keywords" content="rust, rustlang, rust-lang, tobj">
+
+    <title>tobj - Rust</title>
+
+    <link rel="stylesheet" type="text/css" href="../main.css">
+
+    
+    
+</head>
+<body class="rustdoc">
+    <!--[if lte IE 8]>
+    <div class="warning">
+        This old browser is unsupported and will most likely display funky
+        things.
+    </div>
+    <![endif]-->
+
+    
+
+    <section class="sidebar">
+        
+        <p class='location'></p><script>window.sidebarCurrent = {name: 'tobj', ty: 'mod', relpath: '../'};</script>
+    </section>
+
+    <nav class="sub">
+        <form class="search-form js-only">
+            <div class="search-container">
+                <input class="search-input" name="search"
+                       autocomplete="off"
+                       placeholder="Click or press 'S' to search, '?' for more options..."
+                       type="search">
+            </div>
+        </form>
+    </nav>
+
+    <section id='main' class="content mod">
+<h1 class='fqn'><span class='in-band'>Crate <a class='mod' href=''>tobj</a><wbr></span><span class='out-of-band'><a href='stability.html'>[stability]</a> <span id='render-detail'>
+            <a id="collapse-all" href="#">[-]</a>&nbsp;<a id="expand-all" href="#">[+]</a>
+        </span><a id='src-0' href='../src/tobj/lib.rs.html#1-737'>[src]</a></span></h1>
+<div class='docblock'><p>Tiny OBJ loader, inspired by Syoyo&#39;s excellent <a href="https://github.com/syoyo/tinyobjloader">tinyobjloader</a>.
+Aims to be a simple and lightweight option for loading OBJ files, simply returns two vecs
+containing loaded models and materials. All models are made of triangles, any quad or polygon faces
+in an OBJ file will be converted to triangles.</p>
+
+<h1 id="example" class='section-header'><a
+                           href="#example">Example</a></h1>
+<p>In this simple example we load the classic Cornell Box model that only defines positions and
+print out its attributes. This example is a slightly trimmed down version of <code>print_model_info</code>
+and <code>print_material_info</code> combined together, see them for a version that also prints out
+normals and texture coordinates if the model has them.</p>
+<pre id='rust-example-rendered' class='rust '>
+<span class='kw'>use</span> <span class='ident'>std</span>::<span class='ident'>path</span>::<span class='ident'>Path</span>;
+<span class='kw'>use</span> <span class='ident'>tobj</span>;
+
+<span class='kw'>let</span> <span class='ident'>cornell_box</span> <span class='op'>=</span> <span class='ident'>tobj</span>::<span class='ident'>load_obj</span>(<span class='kw-2'>&amp;</span><span class='ident'>Path</span>::<span class='ident'>new</span>(<span class='string'>&quot;cornell_box.obj&quot;</span>));
+<span class='macro'>assert</span><span class='macro'>!</span>(<span class='ident'>cornell_box</span>.<span class='ident'>is_ok</span>());
+<span class='kw'>let</span> (<span class='ident'>models</span>, <span class='ident'>materials</span>) <span class='op'>=</span> <span class='ident'>cornell_box</span>.<span class='ident'>unwrap</span>();
+
+<span class='macro'>println</span><span class='macro'>!</span>(<span class='string'>&quot;# of models: {}&quot;</span>, <span class='ident'>models</span>.<span class='ident'>len</span>());
+<span class='macro'>println</span><span class='macro'>!</span>(<span class='string'>&quot;# of materials: {}&quot;</span>, <span class='ident'>materials</span>.<span class='ident'>len</span>());
+<span class='kw'>for</span> (<span class='ident'>i</span>, <span class='ident'>m</span>) <span class='kw'>in</span> <span class='ident'>models</span>.<span class='ident'>iter</span>().<span class='ident'>enumerate</span>() {
+    <span class='kw'>let</span> <span class='ident'>mesh</span> <span class='op'>=</span> <span class='kw-2'>&amp;</span><span class='ident'>m</span>.<span class='ident'>mesh</span>;
+    <span class='macro'>println</span><span class='macro'>!</span>(<span class='string'>&quot;model[{}].name = {}&quot;</span>, <span class='ident'>i</span>, <span class='ident'>m</span>.<span class='ident'>name</span>);
+    <span class='macro'>println</span><span class='macro'>!</span>(<span class='string'>&quot;model[{}].mesh.material_id = {:?}&quot;</span>, <span class='ident'>i</span>, <span class='ident'>mesh</span>.<span class='ident'>material_id</span>);
+ 
+    <span class='macro'>println</span><span class='macro'>!</span>(<span class='string'>&quot;Size of model[{}].indices: {}&quot;</span>, <span class='ident'>i</span>, <span class='ident'>mesh</span>.<span class='ident'>indices</span>.<span class='ident'>len</span>());
+    <span class='kw'>for</span> <span class='ident'>f</span> <span class='kw'>in</span> <span class='number'>0</span>..(<span class='ident'>mesh</span>.<span class='ident'>indices</span>.<span class='ident'>len</span>() <span class='op'>/</span> <span class='number'>3</span>) {
+        <span class='macro'>println</span><span class='macro'>!</span>(<span class='string'>&quot;    idx[{}] = {}, {}, {}.&quot;</span>, <span class='ident'>f</span>, <span class='ident'>mesh</span>.<span class='ident'>indices</span>[<span class='number'>3</span> <span class='op'>*</span> <span class='ident'>f</span>],
+            <span class='ident'>mesh</span>.<span class='ident'>indices</span>[<span class='number'>3</span> <span class='op'>*</span> <span class='ident'>f</span> <span class='op'>+</span> <span class='number'>1</span>], <span class='ident'>mesh</span>.<span class='ident'>indices</span>[<span class='number'>3</span> <span class='op'>*</span> <span class='ident'>f</span> <span class='op'>+</span> <span class='number'>2</span>]);
+    }
+ 
+    <span class='comment'>// Normals and texture coordinates are also loaded, but not printed in this example</span>
+    <span class='macro'>println</span><span class='macro'>!</span>(<span class='string'>&quot;model[{}].vertices: {}&quot;</span>, <span class='ident'>i</span>, <span class='ident'>mesh</span>.<span class='ident'>positions</span>.<span class='ident'>len</span>() <span class='op'>/</span> <span class='number'>3</span>);
+    <span class='macro'>assert</span><span class='macro'>!</span>(<span class='ident'>mesh</span>.<span class='ident'>positions</span>.<span class='ident'>len</span>() <span class='op'>%</span> <span class='number'>3</span> <span class='op'>==</span> <span class='number'>0</span>);
+    <span class='kw'>for</span> <span class='ident'>v</span> <span class='kw'>in</span> <span class='number'>0</span>..(<span class='ident'>mesh</span>.<span class='ident'>positions</span>.<span class='ident'>len</span>() <span class='op'>/</span> <span class='number'>3</span>) {
+        <span class='macro'>println</span><span class='macro'>!</span>(<span class='string'>&quot;    v[{}] = ({}, {}, {})&quot;</span>, <span class='ident'>v</span>, <span class='ident'>mesh</span>.<span class='ident'>positions</span>[<span class='number'>3</span> <span class='op'>*</span> <span class='ident'>v</span>],
+            <span class='ident'>mesh</span>.<span class='ident'>positions</span>[<span class='number'>3</span> <span class='op'>*</span> <span class='ident'>v</span> <span class='op'>+</span> <span class='number'>1</span>], <span class='ident'>mesh</span>.<span class='ident'>positions</span>[<span class='number'>3</span> <span class='op'>*</span> <span class='ident'>v</span> <span class='op'>+</span> <span class='number'>2</span>]);
+    }
+}
+<span class='kw'>for</span> (<span class='ident'>i</span>, <span class='ident'>m</span>) <span class='kw'>in</span> <span class='ident'>materials</span>.<span class='ident'>iter</span>().<span class='ident'>enumerate</span>() {
+    <span class='macro'>println</span><span class='macro'>!</span>(<span class='string'>&quot;material[{}].name = {}&quot;</span>, <span class='ident'>i</span>, <span class='ident'>m</span>.<span class='ident'>name</span>);
+    <span class='macro'>println</span><span class='macro'>!</span>(<span class='string'>&quot;    material.Ka = ({}, {}, {})&quot;</span>, <span class='ident'>m</span>.<span class='ident'>ambient</span>[<span class='number'>0</span>], <span class='ident'>m</span>.<span class='ident'>ambient</span>[<span class='number'>1</span>], <span class='ident'>m</span>.<span class='ident'>ambient</span>[<span class='number'>2</span>]);
+    <span class='macro'>println</span><span class='macro'>!</span>(<span class='string'>&quot;    material.Kd = ({}, {}, {})&quot;</span>, <span class='ident'>m</span>.<span class='ident'>diffuse</span>[<span class='number'>0</span>], <span class='ident'>m</span>.<span class='ident'>diffuse</span>[<span class='number'>1</span>], <span class='ident'>m</span>.<span class='ident'>diffuse</span>[<span class='number'>2</span>]);
+    <span class='macro'>println</span><span class='macro'>!</span>(<span class='string'>&quot;    material.Ks = ({}, {}, {})&quot;</span>, <span class='ident'>m</span>.<span class='ident'>specular</span>[<span class='number'>0</span>], <span class='ident'>m</span>.<span class='ident'>specular</span>[<span class='number'>1</span>], <span class='ident'>m</span>.<span class='ident'>specular</span>[<span class='number'>2</span>]);
+    <span class='macro'>println</span><span class='macro'>!</span>(<span class='string'>&quot;    material.Ns = {}&quot;</span>, <span class='ident'>m</span>.<span class='ident'>shininess</span>);
+    <span class='macro'>println</span><span class='macro'>!</span>(<span class='string'>&quot;    material.d = {}&quot;</span>, <span class='ident'>m</span>.<span class='ident'>dissolve</span>);
+    <span class='macro'>println</span><span class='macro'>!</span>(<span class='string'>&quot;    material.map_Ka = {}&quot;</span>, <span class='ident'>m</span>.<span class='ident'>ambient_texture</span>);
+    <span class='macro'>println</span><span class='macro'>!</span>(<span class='string'>&quot;    material.map_Kd = {}&quot;</span>, <span class='ident'>m</span>.<span class='ident'>diffuse_texture</span>);
+    <span class='macro'>println</span><span class='macro'>!</span>(<span class='string'>&quot;    material.map_Ks = {}&quot;</span>, <span class='ident'>m</span>.<span class='ident'>specular_texture</span>);
+    <span class='macro'>println</span><span class='macro'>!</span>(<span class='string'>&quot;    material.map_Ns = {}&quot;</span>, <span class='ident'>m</span>.<span class='ident'>normal_texture</span>);
+    <span class='macro'>println</span><span class='macro'>!</span>(<span class='string'>&quot;    material.map_d = {}&quot;</span>, <span class='ident'>m</span>.<span class='ident'>dissolve_texture</span>);
+    <span class='kw'>for</span> (<span class='ident'>k</span>, <span class='ident'>v</span>) <span class='kw'>in</span> <span class='kw-2'>&amp;</span><span class='ident'>m</span>.<span class='ident'>unknown_param</span> {
+        <span class='macro'>println</span><span class='macro'>!</span>(<span class='string'>&quot;    material.{} = {}&quot;</span>, <span class='ident'>k</span>, <span class='ident'>v</span>);
+    }
+}
+</pre>
+
+<h1 id="rendering-example" class='section-header'><a
+                           href="#rendering-example">Rendering Example</a></h1>
+<p>For an example of integration with <a href="https://github.com/tomaka/glium">glium</a> to make a simple OBJ viewer, check out
+<a href="https://github.com/Twinklebear/tobj_viewer">tobj viewer</a>. A sample image from the viewer is shown below, the Rust
+logo model was made by <a href="http://blenderartists.org/forum/showthread.php?362836-Rust-language-3D-logo">Nylithius on BlenderArtists</a>.
+The <a href="http://graphics.cs.williams.edu/data/meshes.xml">Rungholt</a> model can be found on Morgan McGuire&#39;s meshes page and
+was originally built by kescha.</p>
+
+<p>The Rungholt model is reasonably large (6.7M triangles, 12.3M vertices) and is loaded in 8.765s (+/- .56s) using a peak
+of ~1GB of memory on a Windows 8 machine with an i7-4790k and 16GB of 1600Mhz DDR3 RAM on tobj 0.0.5 and rustc 1.1.0-nightly 97d4e76c2.
+Future work will focus on improving performance and memory usage.</p>
+
+<p><img src="http://i.imgur.com/uJbca2d.png" alt="Rust Logo"></p>
+
+<p><img src="http://i.imgur.com/k2sC05w.png" alt="Rungholt"></p>
+</div><h2 id='structs' class='section-header'><a href="#structs">Structs</a></h2>
+<table>
+                    <tr>
+                        <td><a class='stability Unmarked' title='No stability level'></a><a class='struct' href='struct.Material.html'
+                               title='tobj::Material'>Material</a></td>
+                        <td class='docblock short'><p>A material that may be referenced by one or more meshes. Standard MTL attributes are supported
+and any unrecognized ones will be stored as Strings in the <code>unknown_param</code> HashMap</p>
+</td>
+                    </tr>
+                
+                    <tr>
+                        <td><a class='stability Unmarked' title='No stability level'></a><a class='struct' href='struct.Mesh.html'
+                               title='tobj::Mesh'>Mesh</a></td>
+                        <td class='docblock short'><p>A mesh made up of triangles loaded from some OBJ file</p>
+</td>
+                    </tr>
+                
+                    <tr>
+                        <td><a class='stability Unmarked' title='No stability level'></a><a class='struct' href='struct.Model.html'
+                               title='tobj::Model'>Model</a></td>
+                        <td class='docblock short'><p>A named model within the file, associates some mesh with a name that was specified with an <code>o</code>
+or <code>g</code> keyword in the OBJ file</p>
+</td>
+                    </tr>
+                </table><h2 id='enums' class='section-header'><a href="#enums">Enums</a></h2>
+<table>
+                    <tr>
+                        <td><a class='stability Unmarked' title='No stability level'></a><a class='enum' href='enum.LoadError.html'
+                               title='tobj::LoadError'>LoadError</a></td>
+                        <td class='docblock short'><p>Possible errors that may occur while loading OBJ and MTL files</p>
+</td>
+                    </tr>
+                </table><h2 id='functions' class='section-header'><a href="#functions">Functions</a></h2>
+<table>
+                    <tr>
+                        <td><a class='stability Unmarked' title='No stability level'></a><a class='fn' href='fn.load_mtl.html'
+                               title='tobj::load_mtl'>load_mtl</a></td>
+                        <td class='docblock short'><p>Load the materials defined in a MTL file
+Returns a pair with a Vec holding all loaded materials and a HashMap containing a mapping of
+material names to indices in the Vec.</p>
+</td>
+                    </tr>
+                
+                    <tr>
+                        <td><a class='stability Unmarked' title='No stability level'></a><a class='fn' href='fn.load_obj.html'
+                               title='tobj::load_obj'>load_obj</a></td>
+                        <td class='docblock short'><p>Load the various objects specified in the OBJ file and any associated MTL file
+Returns a pair of Vecs containing the loaded models and materials from the file.</p>
+</td>
+                    </tr>
+                
+                    <tr>
+                        <td><a class='stability Unmarked' title='No stability level'></a><a class='fn' href='fn.print_material_info.html'
+                               title='tobj::print_material_info'>print_material_info</a></td>
+                        <td class='docblock short'><p>Print out all loaded properties of some materials</p>
+</td>
+                    </tr>
+                
+                    <tr>
+                        <td><a class='stability Unmarked' title='No stability level'></a><a class='fn' href='fn.print_model_info.html'
+                               title='tobj::print_model_info'>print_model_info</a></td>
+                        <td class='docblock short'><p>Print out all loaded properties of some models and associated materials</p>
+</td>
+                    </tr>
+                </table><h2 id='types' class='section-header'><a href="#types">Type Definitions</a></h2>
+<table>
+                    <tr>
+                        <td><a class='stability Unmarked' title='No stability level'></a><a class='type' href='type.LoadResult.html'
+                               title='tobj::LoadResult'>LoadResult</a></td>
+                        <td class='docblock short'><p>LoadResult is a result containing all the models loaded from the file and any materials from
+referenced material libraries, or an error that occured while loading</p>
+</td>
+                    </tr>
+                
+                    <tr>
+                        <td><a class='stability Unmarked' title='No stability level'></a><a class='type' href='type.MTLLoadResult.html'
+                               title='tobj::MTLLoadResult'>MTLLoadResult</a></td>
+                        <td class='docblock short'><p>MTLLoadResult is a result containing all the materials loaded from the file and a map of MTL
+name to index or the error that occured while loading</p>
+</td>
+                    </tr>
+                </table></section>
+    <section id='search' class="content hidden"></section>
+
+    <section class="footer"></section>
+
+    <div id="help" class="hidden">
+        <div class="shortcuts">
+            <h1>Keyboard shortcuts</h1>
+            <dl>
+                <dt>?</dt>
+                <dd>Show this help dialog</dd>
+                <dt>S</dt>
+                <dd>Focus the search field</dd>
+                <dt>&larrb;</dt>
+                <dd>Move up in search results</dd>
+                <dt>&rarrb;</dt>
+                <dd>Move down in search results</dd>
+                <dt>&#9166;</dt>
+                <dd>Go to active search result</dd>
+            </dl>
+        </div>
+        <div class="infos">
+            <h1>Search tricks</h1>
+            <p>
+                Prefix searches with a type followed by a colon (e.g.
+                <code>fn:</code>) to restrict the search to a given type.
+            </p>
+            <p>
+                Accepted types are: <code>fn</code>, <code>mod</code>,
+                <code>struct</code>, <code>enum</code>,
+                <code>trait</code>, <code>typedef</code> (or
+                <code>tdef</code>).
+            </p>
+        </div>
+    </div>
+
+    
+
+    <script>
+        window.rootPath = "../";
+        window.currentCrate = "tobj";
+        window.playgroundUrl = "";
+    </script>
+    <script src="../jquery.js"></script>
+    <script src="../main.js"></script>
+    
+    <script async src="../search-index.js"></script>
+</body>
+</html>
